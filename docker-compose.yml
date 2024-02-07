@@ -1,0 +1,48 @@
+---
+version: "3.4"
+
+services:
+  publisher:
+    build:
+      context: .
+      dockerfile: publisher.Dockerfile
+    ports:
+      - "8080:80"
+    depends_on:
+      - broker
+    environment:
+      - CELERY_BROKER_URL=amqp://broker:5672//
+
+  consumer:
+    build:
+      context: .
+      dockerfile: consumer.Dockerfile
+    ports:
+      - "5001:5001"
+    depends_on:
+      - broker
+    environment:
+      - BROKER_URL=amqp://broker:5672//
+
+  broker:
+    image: "rabbitmq"
+    ports:
+      - "5672:5672"
+    volumes:
+      - broker-data:/data
+
+  flower:
+    image: mher/flower:latest
+    ports:
+      - "5555:5555"
+    depends_on:
+      - broker
+    environment:
+      - BROKER_URL=amqp://guest:guest@broker:5672//
+
+volumes:
+  broker-data:
+
+networks:
+  default:
+    driver: bridge
