@@ -29,7 +29,7 @@ services:
     ports:
       - "5672:5672"
     volumes:
-      - broker-data:/data
+      - broker-data:/var/lib/rabbitmq
 
   flower:
     image: mher/flower:latest
