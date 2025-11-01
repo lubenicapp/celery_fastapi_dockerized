@@ -7,6 +7,7 @@ name = "pypi"
 celery = "*"
 fastapi = "*"
 uvicorn = "*"
+redis = "*"
 
 [dev-packages]
 

@@ -31,6 +31,14 @@ services:
     volumes:
       - broker-data:/var/lib/rabbitmq
 
+  redis:
+    image: "redis:7-alpine"
+    ports:
+      - "6379:6379"
+    command: redis-server --save 60 1 --loglevel warning
+    volumes:
+      - redis-data:/data
+
   flower:
     image: mher/flower:latest
     ports:
@@ -42,6 +50,7 @@ services:
 
 volumes:
   broker-data:
+  redis-data:
 
 networks:
   default:
