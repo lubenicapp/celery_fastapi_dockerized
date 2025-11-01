@@ -1,5 +1,5 @@
 FROM python:3.14-slim
-ENTRYPOINT ["uv", "run", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "80"]
+ENTRYPOINT ["uv", "run", "uvicorn", "publisher.app:app", "--host", "0.0.0.0", "--port", "80"]
 EXPOSE 80
 
 WORKDIR /app
@@ -12,4 +12,4 @@ COPY uv.lock* ./
 RUN uv sync --locked
 
 COPY ./consumer ./consumer
-COPY ./app.py  ./app.py
+COPY ./publisher  ./publisher

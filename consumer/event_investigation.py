@@ -20,7 +20,7 @@ def process_event(event, task_id):
     try:
         for i in range(5):
             time.sleep(1)
-            r.publish(task_id, f"Processed event: {event}, step : {i}")
+            r.publish(task_id, f"Processed event: {event} -  step : {i}")
     except Exception as e:
         print(f"Error publishing to Redis: {e}")
 

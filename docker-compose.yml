@@ -1,6 +1,3 @@
----
-version: "3.4"
-
 services:
   publisher:
     build:
@@ -23,6 +20,15 @@ services:
       - broker
     environment:
       - BROKER_URL=amqp://broker:5672//
+
+  front:
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+    ports:
+      - "8081:80"
+    depends_on:
+      - publisher
 
   broker:
     image: "rabbitmq"
