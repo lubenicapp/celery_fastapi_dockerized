@@ -11,4 +11,4 @@ COPY uv.lock* ./
 
 RUN uv sync --locked
 
-COPY ./consumer  ./consumer
+COPY ./consumer ./consumer

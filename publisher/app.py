@@ -10,7 +10,7 @@ from pydantic import BaseModel
 from starlette.websockets import WebSocket
 
 
-from consumer.event_investigation import process_event
+from celery import Celery
 
 
 logging.basicConfig(level=logging.INFO)
@@ -29,6 +29,10 @@ app.add_middleware(
 redis_url = os.getenv("REDIS_URL", "redis://redis:6379/0")
 r = redis_async.from_url(redis_url)
 
+# Initialize Celery app to access tasks by name
+BROKER_URL = os.getenv('CELERY_BROKER_URL', 'amqp://broker:5672//')
+celery_app = Celery(broker=BROKER_URL)
+
 class EventPayload(BaseModel):
     event: str
 
@@ -41,7 +45,8 @@ async def monitor_event(payload: EventPayload):
     task_id = uuid.uuid4().hex
 
     print("sending event to be processed")
-    process_event.delay(payload.event, task_id)
+    # Send task by name instead of by function reference
+    celery_app.send_task('consumer.event_investigation.process_event', args=[payload.event, task_id])
 
     return {"message": "Event received", "event": payload.event, "task_id": task_id}
 
