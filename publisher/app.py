@@ -42,13 +42,20 @@ async def monitor_event(payload: EventPayload):
     if not isinstance(payload.event, str):
         raise HTTPException(status_code=400, detail="Event must be a string")
 
-    task_id = uuid.uuid4().hex
-
     print("sending event to be processed")
-    # Send task by name instead of by function reference
-    celery_app.send_task('process_event', args=[payload.event, task_id])
+    async_result  = celery_app.send_task('process_event', args=[payload.event])
+    task_id = async_result.id
 
     return {"message": "Event received", "event": payload.event, "task_id": task_id}
+
+
+@app.post("/kill/{task_id}")
+async def kill_task(task_id: str):
+    try:
+        celery_app.control.revoke(task_id, terminate=True, signal='SIGKILL')
+        return {"message": "Task killed successfully", "task_id": task_id}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to kill task: {str(e)}")
 
 
 @app.websocket("/ws/{task_id}")

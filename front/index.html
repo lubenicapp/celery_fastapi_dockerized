@@ -50,6 +50,24 @@
         button:hover {
             background-color: #0056b3;
         }
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+        .button-group button {
+            width: auto;
+            flex: 1;
+        }
+        .kill-button {
+            background-color: #dc3545;
+        }
+        .kill-button:hover {
+            background-color: #c82333;
+        }
+        .kill-button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
         .result {
             margin-top: 20px;
             padding: 15px;
@@ -93,6 +111,9 @@
             <button type="submit">Send Event</button>
         </form>
         <div id="result" class="result"></div>
+        <div id="kill-task-container" style="display: none; margin-top: 15px;">
+            <button id="kill-task-button" class="kill-button" onclick="killCurrentTask()">Kill Task</button>
+        </div>
         <div id="websocket-container" style="display: none;">
             <h2>WebSocket Messages</h2>
             <div id="websocket-messages" class="websocket-messages"></div>
@@ -101,6 +122,7 @@
 
     <script>
         let ws = null;
+        let currentTaskId = null;
 
         document.getElementById('eventForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -128,6 +150,12 @@
                 if (response.ok) {
                     resultDiv.textContent = `Success: ${data.message}\nEvent: ${data.event}\nTask ID: ${data.task_id}`;
                     resultDiv.className = 'result success';
+
+                    // Store current task ID
+                    currentTaskId = data.task_id;
+
+                    // Show kill button
+                    document.getElementById('kill-task-container').style.display = 'block';
 
                     // Start WebSocket connection for this task
                     startWebSocketConnection(data.task_id);
@@ -199,6 +227,43 @@
                 console.error('WebSocket error:', error);
                 websocketMessages.innerHTML += `<div class="message">WebSocket error: ${error.message}</div>`;
             };
+        }
+
+        async function killCurrentTask() {
+            if (!currentTaskId) {
+                alert('No active task to kill');
+                return;
+            }
+
+            const killButton = document.getElementById('kill-task-button');
+            killButton.disabled = true;
+            killButton.textContent = 'Killing Task...';
+
+            try {
+                const response = await fetch(`http://localhost:8080/kill/${currentTaskId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    const websocketMessages = document.getElementById('websocket-messages');
+                    websocketMessages.innerHTML += `<div class="message" style="background-color: #ffcccc;">Task killed: ${data.message}</div>`;
+                    websocketMessages.scrollTop = websocketMessages.scrollHeight;
+                    killButton.textContent = 'Task Killed';
+                } else {
+                    alert(`Error killing task: ${data.detail || 'Unknown error'}`);
+                    killButton.disabled = false;
+                    killButton.textContent = 'Kill Task';
+                }
+            } catch (error) {
+                alert(`Network Error: ${error.message}`);
+                killButton.disabled = false;
+                killButton.textContent = 'Kill Task';
+            }
         }
     </script>
 </body>
