@@ -1,0 +1,13 @@
+[project]
+name = "celery-fastapi-dockerized"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi>=0.120.4",
+    "uvicorn>=0.38.0",
+    "celery>=5.3.0",
+    "redis>=7.0.1",
+    "websockets>=15.0.1",
+]

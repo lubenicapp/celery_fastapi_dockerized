@@ -1,7 +1,7 @@
 services:
   publisher:
     build:
-      context: .
+      context: ./publisher
       dockerfile: publisher.Dockerfile
     ports:
       - "8080:80"
@@ -12,7 +12,7 @@ services:
 
   consumer:
     build:
-      context: .
+      context: ./consumer
       dockerfile: consumer.Dockerfile
     ports:
       - "5001:5001"
@@ -24,7 +24,7 @@ services:
   front:
     build:
       context: ./front
-      dockerfile: Dockerfile
+      dockerfile: front.Dockerfile
     ports:
       - "8081:80"
     depends_on:

@@ -12,7 +12,7 @@ redis_url = os.getenv("REDIS_URL", "redis://redis:6379/0")
 r = redis.from_url(redis_url)
 
 
-@app.task
+@app.task(name='process_event')
 def process_event(event, task_id):
     print(f"processing event : {event} ; task_id : {task_id}")
 

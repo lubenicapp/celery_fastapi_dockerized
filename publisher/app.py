@@ -46,7 +46,7 @@ async def monitor_event(payload: EventPayload):
 
     print("sending event to be processed")
     # Send task by name instead of by function reference
-    celery_app.send_task('consumer.event_investigation.process_event', args=[payload.event, task_id])
+    celery_app.send_task('process_event', args=[payload.event, task_id])
 
     return {"message": "Event received", "event": payload.event, "task_id": task_id}
 

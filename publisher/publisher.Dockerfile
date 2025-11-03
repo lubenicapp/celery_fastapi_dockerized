@@ -11,4 +11,4 @@ COPY pyproject.toml ./
 COPY uv.lock* ./
 RUN uv sync --locked
 
-COPY ./publisher  ./publisher
+COPY .  ./publisher
